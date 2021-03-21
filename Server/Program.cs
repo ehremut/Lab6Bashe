@@ -64,11 +64,11 @@ namespace Server
         {
             while (isGaming)
             {
-                if (gameCount != 0)
+                if (gameCount > 0)
                 {
                     var serverRemoveCount = CheckStatus();
                     gameCount -= serverRemoveCount;
-                    if (gameCount == 0)
+                    if (gameCount <= 0)
                     {
                         writer = new StreamWriter(stream);
                         await writer.WriteLineAsync("Server is win!");
@@ -83,7 +83,7 @@ namespace Server
                     if (int.TryParse(clientResponce, out clientStep))
                     {
                         gameCount -= clientStep;
-                        if (gameCount == 0)
+                        if (gameCount <= 0)
                         {
                             writer = new StreamWriter(stream);
                             await writer.WriteLineAsync("Client is win!");

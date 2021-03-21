@@ -66,7 +66,6 @@ namespace Client
 
                 } while (!int.TryParse(nowStep, out stepClient) || stepClient <= 0 || stepClient > maxStep);
 
-                
                 await writer.WriteLineAsync(nowStep);
                 await writer.FlushAsync();
                 answer = await reader.ReadLineAsync();
