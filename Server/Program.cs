@@ -47,10 +47,10 @@ namespace Server
             writer = new StreamWriter(stream);
             do
             {
-                string fullmessage = await reader.ReadLineAsync();
-                if (fullmessage != null)
+                string sendMessage = await reader.ReadLineAsync();
+                if (sendMessage != null)
                 {
-                    string[] listMessage = fullmessage.Split(",");
+                    string[] listMessage = sendMessage.Split(" ");
                     if (int.TryParse(listMessage[0], out gameCount) && int.TryParse(listMessage[1], out step))
                     {
                         break;

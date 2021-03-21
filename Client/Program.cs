@@ -29,7 +29,7 @@ namespace Client
                 step = Console.ReadLine();
                 if (int.TryParse(count, out gameCount) && int.TryParse(step, out maxStep) && gameCount > maxStep)
                 {
-                    fullmessage = count + ',' + step;
+                    fullmessage = count + ' ' + step;
                 }
                 else
                 {
