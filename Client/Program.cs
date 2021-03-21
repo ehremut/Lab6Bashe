@@ -13,30 +13,13 @@ namespace Client
         private static TcpClient client;
         private static string fullmessage;
         private static bool isRunning = true;
-
+        private static int gameCount = 0;
+        private static int maxStep = 0;
+        
         static async Task Main(string[] args)
         {
             Console.WriteLine("Tcp User start");
-            var gameCount = 0;
-            var maxStep = 0;
-            var count = "";
-            var step = "";
-            do
-            {
-                Console.Write("Enter game count: ");
-                count = Console.ReadLine();
-                Console.Write("Enter max step: ");
-                step = Console.ReadLine();
-                if (int.TryParse(count, out gameCount) && int.TryParse(step, out maxStep) && gameCount > maxStep)
-                {
-                    fullmessage = count + ' ' + step;
-                }
-                else
-                {
-                    Console.WriteLine("Input correct numbers");
-                }
-            } while (!int.TryParse(count, out gameCount) || !int.TryParse(step, out maxStep) || gameCount <= maxStep);
-
+            CheckInput();
             client = new TcpClient();
             await client.ConnectAsync(IPAddress.Loopback, serverPort);
             NetworkStream stream = client.GetStream();
@@ -76,6 +59,27 @@ namespace Client
                 Console.WriteLine(answer);
             }
             client.Close();
+        }
+
+        private static void CheckInput()
+        {
+            var count = "";
+            var step = "";
+            do
+            {
+                Console.Write("Enter game count: ");
+                count = Console.ReadLine();
+                Console.Write("Enter max step: ");
+                step = Console.ReadLine();
+                if (int.TryParse(count, out gameCount) && int.TryParse(step, out maxStep) && gameCount > maxStep)
+                {
+                    fullmessage = count + ' ' + step;
+                }
+                else
+                {
+                    Console.WriteLine("Input correct numbers");
+                }
+            } while (!int.TryParse(count, out gameCount) || !int.TryParse(step, out maxStep) || gameCount <= maxStep);
         }
     }
 }

@@ -45,18 +45,7 @@ namespace Server
             stream = client.GetStream();
             reader = new StreamReader(stream);
             writer = new StreamWriter(stream);
-            do
-            {
-                string sendMessage = await reader.ReadLineAsync();
-                if (sendMessage != null)
-                {
-                    string[] listMessage = sendMessage.Split(" ");
-                    if (int.TryParse(listMessage[0], out gameCount) && int.TryParse(listMessage[1], out step))
-                    {
-                        break;
-                    }
-                }
-            } while (gameCount <= step);
+            await GetSettings();
             await Game();
         }
 
@@ -66,35 +55,60 @@ namespace Server
             {
                 if (gameCount > 0)
                 {
-                    var serverRemoveCount = CheckStatus();
-                    gameCount -= serverRemoveCount;
-                    if (gameCount <= 0)
-                    {
-                        writer = new StreamWriter(stream);
-                        await writer.WriteLineAsync("Server is win!");
-                        await writer.FlushAsync();
-                        isGaming = false;
-                    }
-                    var str = "Server choice is " + serverRemoveCount + " Left count " + gameCount; 
-                    await writer.WriteLineAsync(str);
-                    await writer.FlushAsync();
+                    await ServerSteps();
                     var clientResponce = await reader.ReadLineAsync();
                     int clientStep;
                     if (int.TryParse(clientResponce, out clientStep))
                     {
-                        gameCount -= clientStep;
-                        if (gameCount <= 0)
-                        {
-                            writer = new StreamWriter(stream);
-                            await writer.WriteLineAsync("Client is win!");
-                            await writer.FlushAsync();
-                            isGaming = false;
-                        }
+                        await ClientSteps(clientStep);
                     }
                 }
             }
             client.Close();
         }
+
+        private static async Task GetSettings()
+        {
+            do
+            {
+                string sendMessage = await reader.ReadLineAsync();
+                if (sendMessage != null)
+                {
+                    string[] listMessage = sendMessage.Split(" ");
+                    int.TryParse(listMessage[0], out gameCount);
+                    int.TryParse(listMessage[1], out step);
+                }
+            } while (gameCount <= step);
+        }
+        
+        private static async Task ClientSteps(int clientStep)
+        {
+            gameCount -= clientStep;
+            if (gameCount <= 0)
+            {
+                writer = new StreamWriter(stream);
+                await writer.WriteLineAsync("Client is win!");
+                await writer.FlushAsync();
+                isGaming = false;
+            }
+        }
+        
+        private static async Task ServerSteps()
+        {
+            var serverRemoveCount = CheckStatus();
+            gameCount -= serverRemoveCount;
+            if (gameCount <= 0)
+            {
+                writer = new StreamWriter(stream);
+                await writer.WriteLineAsync("Server is win!");
+                await writer.FlushAsync();
+                isGaming = false;
+            }
+            var str = "Server choice is " + serverRemoveCount + " Left count " + gameCount; 
+            await writer.WriteLineAsync(str);
+            await writer.FlushAsync();
+        }
+        
         private static int CheckStatus()
         {
             var checkStep = step + 1;
